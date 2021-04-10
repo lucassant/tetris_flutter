@@ -1,13 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:tetromi/alivePoint.dart';
-import 'package:tetromi/block.dart';
-import 'package:tetromi/helper.dart';
-import 'package:tetromi/score_display.dart';
-import 'package:tetromi/user_input.dart';
-
-import 'constants.dart';
+import 'package:tetromi/blocks/alivePoint.dart';
+import 'package:tetromi/blocks/block.dart';
+import 'package:tetromi/util/constants.dart';
+import 'package:tetromi/util/helper.dart';
+import 'package:tetromi/widgets/score_display.dart';
+import 'package:tetromi/widgets/user_input.dart';
 
 class GameWidget extends StatefulWidget {
   @override
