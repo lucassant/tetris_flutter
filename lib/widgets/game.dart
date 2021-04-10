@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:tetromi/blocks/alivePoint.dart';
 import 'package:tetromi/blocks/block.dart';
+import 'package:tetromi/util/colors_app.dart';
 import 'package:tetromi/util/constants.dart';
 import 'package:tetromi/util/helper.dart';
+import 'package:tetromi/widgets/next_block.dart';
 import 'package:tetromi/widgets/score_display.dart';
 import 'package:tetromi/widgets/user_input.dart';
 
@@ -16,6 +18,7 @@ class GameWidget extends StatefulWidget {
 class _GameWidgetState extends State<GameWidget> {
   LastButtonPressed performAction = LastButtonPressed.NONE;
   Block? currentBlock;
+  Block? nextBlock;
   late Timer timer;
   List<AlivePoint> alivePoints = [];
   int score = 0;
@@ -29,15 +32,35 @@ class _GameWidgetState extends State<GameWidget> {
   void onActionButtonPressed(LastButtonPressed newAction) {
     setState(() {
       performAction = newAction;
+
+      if (performAction != LastButtonPressed.NONE) {
+        switch (performAction) {
+          case LastButtonPressed.LEFT:
+            currentBlock?.move(MoveDir.LEFT);
+            break;
+          case LastButtonPressed.RIGHT:
+            currentBlock?.move(MoveDir.RIGHT);
+            break;
+          case LastButtonPressed.ROTATE_LEFT:
+            currentBlock?.rotateLeft();
+            break;
+          case LastButtonPressed.ROTATE_RIGHT:
+            currentBlock?.rotateRight();
+            break;
+          default:
+            break;
+        }
+      }
+
+      performAction = LastButtonPressed.NONE;
     });
   }
 
   void _startGame() {
     setState(() {
       currentBlock = getRandomBlock();
+      nextBlock = getRandomBlock();
     });
-
-    print('$currentBlock');
 
     timer = new Timer.periodic(
       new Duration(milliseconds: GAME_SPEED),
@@ -122,36 +145,14 @@ class _GameWidgetState extends State<GameWidget> {
       saveOldBlock();
 
       setState(() {
-        currentBlock = getRandomBlock();
+        currentBlock = nextBlock;
+        nextBlock = getRandomBlock();
       });
     }
 
     setState(() {
       currentBlock?.move(MoveDir.DOWN);
     });
-
-    if (performAction != LastButtonPressed.NONE) {
-      setState(() {
-        switch (performAction) {
-          case LastButtonPressed.LEFT:
-            currentBlock?.move(MoveDir.LEFT);
-            break;
-          case LastButtonPressed.RIGHT:
-            currentBlock?.move(MoveDir.RIGHT);
-            break;
-          case LastButtonPressed.ROTATE_LEFT:
-            currentBlock?.rotateLeft();
-            break;
-          case LastButtonPressed.ROTATE_RIGHT:
-            currentBlock?.rotateRight();
-            break;
-          default:
-            break;
-        }
-
-        performAction = LastButtonPressed.NONE;
-      });
-    }
   }
 
   Widget? drawTetrisBlocks() {
@@ -192,22 +193,32 @@ class _GameWidgetState extends State<GameWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(16.0),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ScoreDisplay(score: score),
+              SizedBox(
+                width: 10,
+              ),
+              NextBlock(
+                nextBlock: nextBlock ?? Block(),
+              ),
+            ],
+          ),
           Container(
             width: GAME_WIDTH,
             height: GAME_HEIGHT,
-            decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.white, width: 2),
+                borderRadius: BorderRadius.circular(4),
+                color: COR_BACKGROUND),
             child: playerLost() ? getGameOverText(score) : drawTetrisBlocks(),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ScoreDisplay(score: score),
-              UserInput(onActionButtonPressed: onActionButtonPressed),
-            ],
-          )
+          UserInput(onActionButtonPressed: onActionButtonPressed)
         ],
       ),
     );

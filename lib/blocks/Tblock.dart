@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:tetromi/blocks/block.dart';
 import 'package:tetromi/blocks/point.dart';
+import 'package:tetromi/util/colors_app.dart';
 
 class TBlock extends Block {
   TBlock(int width) {
@@ -9,6 +9,6 @@ class TBlock extends Block {
     points[2] = Point((width / 2 + 1).floor(), 0);
     points[3] = Point((width / 2 + 0).floor(), -1);
     rotationCenter = points[1];
-    color = Colors.orange;
+    color = COR_TBLOCK;
   }
 }
